@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MJU Bank – Static UI</title>
+  <style>
+    :root { --bg:#0b1220; --card:#111a2b; --text:#e5ecff; --muted:#9fb1d6; --accent:#4da3ff; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,Segoe UI,Apple SD Gothic Neo,Pretendard,Arial;}
+    h1,h2{margin:0 0 .6rem}
+    .wrap{max-width:1080px;margin:24px auto;padding:0 16px}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+    .card{background:var(--card);border:1px solid #1b2740;border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    label{display:block;margin:.4rem 0 .2rem;color:var(--muted)}
+    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #263353;background:#0e1727;color:var(--text)}
+    input[type="date"]{color-scheme:dark}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    button{margin-top:10px;padding:10px 14px;border:0;border-radius:10px;background:var(--accent);color:#07101d;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .log{white-space:pre-wrap;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;background:#0a1322;border:1px solid #1b2740;border-radius:12px;padding:12px;max-height:360px;overflow:auto}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border-bottom:1px solid #223052;padding:8px;font-size:13px}
+    th{color:#b9c9f0;text-align:left}
+    .ok{color:#7dffa6}
+    .err{color:#ff8f8f}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MJU Bank – Demo (Static)</h1>
+  <p class="muted">백엔드 REST API에 fetch로 붙는 정적 페이지입니다. Spring Security를 추가했다면 CSRF 설정을 조정해야 합니다.</p>
+
+  <div class="grid">
+
+    <!-- Health -->
+    <section class="card">
+      <h2>헬스 체크</h2>
+      <button id="btnHealth">/api/health</button>
+      <div id="health" class="log" aria-live="polite"></div>
+    </section>
+
+    <!-- Create Customer -->
+    <section class="card">
+      <h2>고객 생성</h2>
+      <form id="fCustomer">
+        <label>주민번호(rrn)</label>
+        <input name="rrn" placeholder="900101-1234567" required />
+        <label>이름</label>
+        <input name="name" placeholder="홍길동" required />
+        <div class="row">
+          <div>
+            <label>생년월일</label>
+            <input type="date" name="birthDate" required />
+          </div>
+          <div>
+            <label>이메일</label>
+            <input name="email" placeholder="user@example.com" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>전화</label>
+            <input name="phone" placeholder="010-1234-5678" />
+          </div>
+          <div>
+            <label>직업</label>
+            <input name="job" placeholder="학생" />
+          </div>
+        </div>
+        <label>주소</label>
+        <input name="address" placeholder="서울시 …" />
+        <button type="submit">고객 생성</button>
+      </form>
+      <div id="outCustomer" class="log"></div>
+    </section>
+
+    <!-- Open Account -->
+    <section class="card">
+      <h2>계좌 개설</h2>
+      <form id="fOpen">
+        <label>고객 ID</label>
+        <input name="customerId" type="number" min="1" placeholder="1" required />
+        <div class="row">
+          <div>
+            <label>계좌종류</label>
+            <select name="accountType">
+              <option>DEMAND</option>
+              <option>SAVINGS</option>
+              <option>INSTALLMENT</option>
+              <option>OTHER</option>
+            </select>
+          </div>
+          <div>
+            <label>계좌번호(선택)</label>
+            <input name="accountNo" placeholder="110-123-456789" />
+          </div>
+        </div>
+        <button type="submit">계좌 개설</button>
+      </form>
+      <div id="outOpen" class="log"></div>
+    </section>
+
+    <!-- Deposit -->
+    <section class="card">
+      <h2>입금</h2>
+      <form id="fDeposit">
+        <label>계좌 ID</label>
+        <input name="accountId" type="number" min="1" required />
+        <div class="row">
+          <div>
+            <label>금액</label>
+            <input name="amount" type="number" min="1" step="0.01" placeholder="500000" required />
+          </div>
+          <div>
+            <label>설명</label>
+            <input name="description" placeholder="첫 입금" />
+          </div>
+        </div>
+        <button type="submit">입금</button>
+      </form>
+      <div id="outDeposit" class="log"></div>
+    </section>
+
+    <!-- Withdraw -->
+    <section class="card">
+      <h2>출금</h2>
+      <form id="fWithdraw">
+        <label>계좌 ID</label>
+        <input name="accountId" type="number" min="1" required />
+        <div class="row">
+          <div>
+            <label>금액</label>
+            <input name="amount" type="number" min="1" step="0.01" placeholder="100000" required />
+          </div>
+          <div>
+            <label>설명</label>
+            <input name="description" placeholder="ATM 출금" />
+          </div>
+        </div>
+        <button type="submit">출금</button>
+      </form>
+      <div id="outWithdraw" class="log"></div>
+    </section>
+
+    <!-- Recent Txns -->
+    <section class="card" style="grid-column:1/-1">
+      <h2>최근 거래(최대 20건)</h2>
+      <form id="fTxns" class="row" style="align-items:end">
+        <div>
+          <label>계좌 ID</label>
+          <input name="accountId" type="number" min="1" required />
+        </div>
+        <button type="submit" style="height:42px">조회</button>
+      </form>
+      <div id="txnsArea" class="log"></div>
+      <div id="txnsTable"></div>
+    </section>
+
+    <!-- Issue Card -->
+    <section class="card" style="grid-column:1/-1">
+      <h2>카드 발급</h2>
+      <form id="fCard">
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+          <div>
+            <label>카드번호</label>
+            <input name="cardNo" placeholder="5544-3311-7788-9900" required />
+          </div>
+          <div>
+            <label>고객 ID</label>
+            <input name="customerId" type="number" min="1" required />
+          </div>
+          <div>
+            <label>연결 계좌 ID</label>
+            <input name="accountId" type="number" min="1" required />
+          </div>
+          <div>
+            <label>신청일자</label>
+            <input name="appliedAt" type="date" required />
+          </div>
+          <div>
+            <label>한도(신용카드)</label>
+            <input name="creditLimit" type="number" step="0.01" placeholder="(선택)" />
+          </div>
+          <div>
+            <label>결제일(1~28)</label>
+            <input name="billingDay" type="number" min="1" max="28" placeholder="(선택)" />
+          </div>
+          <div>
+            <label>카드종류</label>
+            <select name="cardType">
+              <option>DEBIT</option>
+              <option>CREDIT</option>
+              <option>PREPAID</option>
+              <option>OTHER</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">카드 발급</button>
+      </form>
+      <div id="outCard" class="log"></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  const $ = s => document.querySelector(s);
+  const out = (el, data, ok=true) => el.innerHTML =
+      (ok ? '✅ ' : '⛔ ') + '<span class="'+(ok?'ok':'err')+'">' + (ok ? '성공' : '실패') +
+      '</span>\n' + (typeof data==='string' ? data : JSON.stringify(data, null, 2));
+
+  async function api(path, method='GET', body) {
+    const opt = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opt.body = JSON.stringify(body);
+    const res = await fetch(path, opt);
+    const text = await res.text();
+    let json; try { json = text ? JSON.parse(text) : null; } catch { json = text; }
+    if (!res.ok) throw json || text || res.statusText;
+    return json;
+  }
+
+  // Health
+  $('#btnHealth').onclick = async () => {
+    try { out($('#health'), await api('/api/health')); }
+    catch (e) { out($('#health'), e, false); }
+  };
+
+  // 고객 생성
+  $('#fCustomer').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const body = Object.fromEntries(f.entries());
+    try { out($('#outCustomer'), await api('/api/customers','POST', body)); }
+    catch (err) { out($('#outCustomer'), err, false); }
+  });
+
+  // 계좌 개설
+  $('#fOpen').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const body = {
+      customerId: Number(f.get('customerId')),
+      accountType: f.get('accountType'),
+      accountNo: f.get('accountNo') || null
+    };
+    try { out($('#outOpen'), await api('/api/accounts','POST', body)); }
+    catch (err) { out($('#outOpen'), err, false); }
+  });
+
+  // 입금
+  $('#fDeposit').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const body = {
+      accountId: Number(f.get('accountId')),
+      amount: Number(f.get('amount')),
+      description: f.get('description') || null
+    };
+    try { out($('#outDeposit'), await api('/api/accounts/deposit','POST', body)); }
+    catch (err) { out($('#outDeposit'), err, false); }
+  });
+
+  // 출금
+  $('#fWithdraw').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const body = {
+      accountId: Number(f.get('accountId')),
+      amount: Number(f.get('amount')),
+      description: f.get('description') || null
+    };
+    try { out($('#outWithdraw'), await api('/api/accounts/withdraw','POST', body)); }
+    catch (err) { out($('#outWithdraw'), err, false); }
+  });
+
+  // 최근 거래
+  $('#fTxns').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = Number(new FormData(e.target).get('accountId'));
+    $('#txnsTable').innerHTML = '';
+    try {
+      const data = await api(`/api/accounts/${id}/txns`);
+      out($('#txnsArea'), {count: data.length});
+      if (Array.isArray(data) && data.length) {
+        const rows = data.map(t => `
+          <tr>
+            <td>${t.txnNo}</td>
+            <td>${t.txnType}</td>
+            <td>${t.txnAt?.replace('T',' ')}</td>
+            <td style="text-align:right">${Number(t.amount).toLocaleString()}</td>
+            <td>${t.description??''}</td>
+            <td style="text-align:right">${Number(t.balanceAfter).toLocaleString()}</td>
+          </tr>`).join('');
+        $('#txnsTable').innerHTML = `
+          <table>
+            <thead><tr>
+              <th>번호</th><th>구분</th><th>일시</th>
+              <th style="text-align:right">금액</th><th>내용</th>
+              <th style="text-align:right">거래후잔액</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      }
+    } catch (err) { out($('#txnsArea'), err, false); }
+  });
+
+  // 카드 발급
+  $('#fCard').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const body = {
+      cardNo: f.get('cardNo'),
+      customerId: Number(f.get('customerId')),
+      accountId: Number(f.get('accountId')),
+      appliedAt: f.get('appliedAt'),
+      creditLimit: f.get('creditLimit') ? Number(f.get('creditLimit')) : null,
+      billingDay: f.get('billingDay') ? Number(f.get('billingDay')) : null,
+      cardType: f.get('cardType')
+    };
+    try { out($('#outCard'), await api('/api/cards','POST', body)); }
+    catch (err) { out($('#outCard'), err, false); }
+  });
+</script>
+</body>
+</html>
