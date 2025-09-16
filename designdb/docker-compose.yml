@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: designdb-app
+    # 호스트로는 8080을 공개하지 않습니다(nginx가 프론트 역할)
+    expose:
+      - "8080"
+    environment:
+      # 필요 시 주입 (예시)
+      # SPRING_PROFILES_ACTIVE: prod
+      # SPRING_DATASOURCE_URL: jdbc:mysql://...
+      # SPRING_DATASOURCE_USERNAME: ...
+      # SPRING_DATASOURCE_PASSWORD: ...
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health || curl -fsS http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [web]
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: designdb-nginx
+    ports:
+      - "80:80"            # 외부는 80으로 접속
+      # - "443:443"        # 추후 HTTPS 쓰면 열기
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [web]
+
+networks:
+  web:
+    driver: bridge
