@@ -7,7 +7,7 @@ services:
     # 호스트로는 8080을 공개하지 않습니다(nginx가 프론트 역할)
     expose:
       - "8080"
-    environment:
+    # environment:
       # 필요 시 주입 (예시)
       # SPRING_PROFILES_ACTIVE: prod
       # SPRING_DATASOURCE_URL: jdbc:mysql://...
